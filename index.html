@@ -1,329 +1,107 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NACT Store — Modern</title>
-  <meta name="description" content="Toko digital modern — integrasi TryPay (placeholder)." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voting App</title>
   <style>
-    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#7c3aed;--glass: rgba(255,255,255,0.04)}
-    *{box-sizing:border-box}
-    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial;margin:0;background:linear-gradient(180deg,#071025 0%, #071b2a 100%);color:#e6eef6;min-height:100vh}
-    header{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;border-bottom:1px solid rgba(255,255,255,0.03)}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700}
-    h1{font-size:18px;margin:0}
-    .controls{display:flex;gap:12px;align-items:center}
-    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.03);padding:10px 14px;border-radius:10px;color:var(--muted);cursor:pointer}
-    .container{max-width:1100px;margin:28px auto;padding:0 20px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:12px}
-    .thumb{height:140px;border-radius:8px;background:linear-gradient(180deg,#0b1220,#07102a);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--muted)}
-    .meta{display:flex;justify-content:space-between;align-items:center}
-    .title{font-weight:600}
-    .price{font-weight:700;color:var(--accent)}
-    .actions{display:flex;gap:8px}
-    .outline{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--muted)}
-    .primary{background:linear-gradient(90deg,var(--accent),#06b6d4);padding:10px 12px;border-radius:10px;border:none;color:#042027;font-weight:700}
-    footer{margin:40px 0 80px;color:var(--muted);text-align:center}
-
-    /* Cart sidebar */
-    .cart-btn{position:relative}
-    .badge{position:absolute;top:-6px;right:-6px;background:#ef4444;color:white;border-radius:999px;padding:4px 7px;font-size:12px}
-    .cart-panel{position:fixed;right:18px;top:76px;width:360px;max-width:92vw;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(2,6,23,0.6);display:flex;flex-direction:column;gap:12px}
-    .cart-item{display:flex;gap:12px;align-items:center}
-    .small{font-size:13px;color:var(--muted)}
-
-    /* modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;padding:20px}
-    .modal{width:720px;max-width:100%;background:linear-gradient(180deg,#061226,#07182b);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
-
-    @media (max-width:720px){header{padding:14px} .container{padding:0 14px}}
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f9;
+      padding: 30px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .candidate {
+      background: white;
+      margin: 10px auto;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 300px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+    .result {
+      margin-top: 20px;
+    }
+    .bar {
+      height: 20px;
+      background: #007bff;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="logo">N</div>
-      <div>
-        <h1>NACT Store</h1>
-        <div class="small">Digital accounts & numbers — modern template</div>
-      </div>
-    </div>
-    <div class="controls">
-      <button class="btn" id="searchBtn">Cari</button>
-      <button class="btn cart-btn" id="openCart">Cart <span id="cartCount" class="badge" style="display:none">0</span></button>
-    </div>
-  </header>
+  <h1>Vote Kandidat</h1>
 
-  <main class="container">
-    <section style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-      <h2 style="margin:0">Produk Populer</h2>
-      <div class="small">Mudah, cepat, aman — terima TryPay</div>
-    </section>
-
-    <section class="grid" id="products"></section>
-
-  </main>
-
-  <!-- Cart panel (hidden by default) -->
-  <div id="cartPanel" class="cart-panel" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <strong>Keranjang</strong>
-      <button class="outline" id="closeCart">Tutup</button>
-    </div>
-    <div id="cartItems"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div class="small">Total</div>
-      <div id="cartTotal" style="font-weight:700">Rp 0</div>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button class="outline" id="clearCart">Kosongkan</button>
-      <button class="primary" id="checkoutBtn">Checkout</button>
-    </div>
-    <div class="small">Note: saya sertakan flow client -> server -> TryPay (placeholder). Ganti endpoint & kunci API dengan kredensial TryPay Anda.</div>
+  <div class="candidate">
+    <h2>Orang A</h2>
+    <button onclick="vote('A')">Pilih</button>
+    <div class="result"><span id="percentA">0%</span></div>
+    <div class="bar" id="barA" style="width:0%"></div>
   </div>
 
-  <!-- Modal product details -->
-  <div id="modalBackdrop" class="modal-backdrop">
-    <div class="modal" role="dialog" aria-modal="true">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <h3 id="modalTitle">Produk</h3>
-          <div class="small" id="modalType">Tipe</div>
-        </div>
-        <button class="outline" id="closeModal">Tutup</button>
-      </div>
-      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
-        <div style="flex:1;min-width:220px">
-          <div class="thumb" id="modalThumb">GAMBAR</div>
-        </div>
-        <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:20px;font-weight:700" id="modalPrice">Rp 0</div>
-          <div class="small" id="modalDesc">Deskripsi singkat produk. Sertakan panduan, syarat, dan cara penggunaan setelah pembayaran.</div>
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="primary" id="modalBuy">Tambahkan ke Keranjang</button>
-            <button class="outline" id="modalBuyNow">Beli Sekarang</button>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="candidate">
+    <h2>Orang B</h2>
+    <button onclick="vote('B')">Pilih</button>
+    <div class="result"><span id="percentB">0%</span></div>
+    <div class="bar" id="barB" style="width:0%"></div>
   </div>
 
-  <footer>© NACT Store — Template modern • Integrasi TryPay (placeholder)</footer>
+  <div class="candidate">
+    <h2>Orang C</h2>
+    <button onclick="vote('C')">Pilih</button>
+    <div class="result"><span id="percentC">0%</span></div>
+    <div class="bar" id="barC" style="width:0%"></div>
+  </div>
 
   <script>
-    /* ====== Contoh data produk (ganti/dinamis via server) ======*/
-    const PRODUCTS = [
-      {id:'am-priv', title:'Alight Motion — Privat', price:5000, type:'Digital Account', desc:'Akun privat Alight Motion. Email & password disertakan.'},
-      {id:'cc-priv', title:'CapCut — Privat', price:5000, type:'Digital Account', desc:'Akun CapCut privat.'},
-      {id:'yt-prem', title:'YouTube Premium — Sharing', price:8000, type:'Sharing Account', desc:'Akun YouTube Premium (share).'}
-    ];
+    let votes = JSON.parse(localStorage.getItem("votes")) || {A:0,B:0,C:0};
+    let hasVoted = localStorage.getItem("hasVoted") || false;
 
-    /* ====== Helper ====== */
-    const formatRupiah = (n)=> 'Rp ' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    function renderResults() {
+      const total = votes.A + votes.B + votes.C;
+      const percentA = total ? ((votes.A/total)*100).toFixed(1) : 0;
+      const percentB = total ? ((votes.B/total)*100).toFixed(1) : 0;
+      const percentC = total ? ((votes.C/total)*100).toFixed(1) : 0;
 
-    /* Render products */
-    const productsEl = document.getElementById('products');
-    PRODUCTS.forEach(p=>{
-      const card = document.createElement('div'); card.className='card';
-      card.innerHTML = `
-        <div class="thumb">${p.title.split(' ')[0]}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">${p.title}</div>
-            <div class="small">${p.type}</div>
-          </div>
-          <div class="price">${formatRupiah(p.price)}</div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="small">Stok: Digital (instan)</div>
-          <div class="actions">
-            <button class="outline" data-id="${p.id}" data-action="detail">Detail</button>
-            <button class="primary" data-id="${p.id}" data-action="add">Beli</button>
-          </div>
-        </div>
-      `;
-      productsEl.appendChild(card);
-    });
+      document.getElementById("percentA").innerText = percentA + "%";
+      document.getElementById("percentB").innerText = percentB + "%";
+      document.getElementById("percentC").innerText = percentC + "%";
 
-    /* ====== Interaksi cart sederhana (local state) ====== */
-    const CART = {};
-    const cartCount = document.getElementById('cartCount');
-    const cartItemsEl = document.getElementById('cartItems');
-    const cartTotalEl = document.getElementById('cartTotal');
-    function updateCartUI(){
-      const ids = Object.keys(CART);
-      const totalQty = ids.reduce((s,id)=>s + CART[id].qty,0);
-      cartCount.style.display = totalQty? 'inline-block':'none';
-      cartCount.textContent = totalQty;
-      cartItemsEl.innerHTML='';
-      let total = 0;
-      ids.forEach(id=>{
-        const item = CART[id];
-        const el = document.createElement('div'); el.className='cart-item';
-        el.innerHTML = `<div style="flex:1"><div>${item.title}</div><div class="small">${formatRupiah(item.price)} • x${item.qty}</div></div><div><button class="outline" data-id="${id}" data-action="minus">-</button> <button class="outline" data-id="${id}" data-action="plus">+</button></div>`;
-        cartItemsEl.appendChild(el);
-        total += item.price * item.qty;
-      })
-      cartTotalEl.textContent = formatRupiah(total);
-    }
+      document.getElementById("barA").style.width = percentA + "%";
+      document.getElementById("barB").style.width = percentB + "%";
+      document.getElementById("barC").style.width = percentC + "%";
 
-    function addToCart(id, qty=1){
-      const p = PRODUCTS.find(x=>x.id===id);
-      if(!p) return;
-      if(!CART[id]) CART[id] = {...p, qty:0};
-      CART[id].qty += qty;
-      updateCartUI();
-    }
-
-    document.body.addEventListener('click', e=>{
-      const action = e.target.getAttribute('data-action');
-      const id = e.target.getAttribute('data-id');
-      if(action==='add') addToCart(id,1);
-      if(action==='detail') openModal(id);
-      if(action==='minus'){ if(CART[id]){ CART[id].qty = Math.max(0,CART[id].qty-1); if(CART[id].qty===0) delete CART[id]; updateCartUI(); }}
-      if(action==='plus'){ addToCart(id,1); }
-    });
-
-    document.getElementById('openCart').addEventListener('click',()=> document.getElementById('cartPanel').style.display='flex');
-    document.getElementById('closeCart').addEventListener('click',()=> document.getElementById('cartPanel').style.display='none');
-    document.getElementById('clearCart').addEventListener('click',()=>{ for(let k in CART) delete CART[k]; updateCartUI(); });
-
-    /* ===== Modal product ===== */
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    function openModal(id){
-      const p = PRODUCTS.find(x=>x.id===id);
-      if(!p) return;
-      document.getElementById('modalTitle').textContent = p.title;
-      document.getElementById('modalType').textContent = p.type;
-      document.getElementById('modalPrice').textContent = formatRupiah(p.price);
-      document.getElementById('modalDesc').textContent = p.desc;
-      document.getElementById('modalThumb').textContent = p.title.split(' ')[0];
-      modalBackdrop.style.display = 'flex';
-
-      // attach buy handlers
-      document.getElementById('modalBuy').onclick = ()=>{ addToCart(p.id); modalBackdrop.style.display='none'; };
-      document.getElementById('modalBuyNow').onclick = ()=>{ singleBuyNow(p.id) };
-    }
-    document.getElementById('closeModal').addEventListener('click',()=> modalBackdrop.style.display='none');
-
-    /* ===== Checkout / TryPay flow (client-side) ======
-       Flow recommended:
-       1. Client -> POST /api/create-payment with order details
-       2. Server validates, creates order in DB, then calls TryPay server-side API with secret key
-       3. TryPay responds with a checkout/payment_url (or token). Server returns this to client
-       4. Client redirects user to payment_url OR opens widget
-       5. TryPay will callback to your server on payment status (webhook). Server updates order.
-
-       BELOW: simple client-side code that POSTS to /api/create-payment
-    */
-
-    async function checkout(){
-      const items = Object.keys(CART).map(id=>({id, qty:CART[id].qty, price:CART[id].price, title:CART[id].title}));
-      if(items.length===0){ alert('Keranjang kosong'); return; }
-      const body = { items, metadata:{source:'web-template'} };
-
-      // show minimal feedback
-      document.getElementById('checkoutBtn').disabled = true; document.getElementById('checkoutBtn').textContent = 'Mengarahkan...';
-      try{
-        const res = await fetch('/api/create-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-        if(!res.ok) throw new Error('Gagal membuat pembayaran');
-        const data = await res.json();
-        // expecting {payment_url: 'https://trypay/checkout/....'} from server
-        if(data.payment_url){
-          // Redirect user to TryPay checkout page
-          window.location.href = data.payment_url;
-        } else if(data.checkout_token){
-          // alternative: open a widget if TryPay offers one
-          // window.open(`https://trypay.widget/checkout?token=${data.checkout_token}`,'_blank')
-          alert('Terima kasih — token checkout diterima. (demo)');
-        } else {
-          throw new Error('Response tidak mengandung payment_url');
-        }
-      }catch(err){
-        alert('Terjadi kesalahan: ' + err.message);
-        document.getElementById('checkoutBtn').disabled = false; document.getElementById('checkoutBtn').textContent = 'Checkout';
+      if (hasVoted) {
+        document.querySelectorAll("button").forEach(btn => btn.disabled = true);
       }
     }
 
-    async function singleBuyNow(productId){
-      const p = PRODUCTS.find(x=>x.id===productId);
-      if(!p) return;
-      const body = { items:[{id:p.id, qty:1, price:p.price, title:p.title}], metadata:{checkout_type:'buy_now'} };
-      document.getElementById('modalBuyNow').disabled = true; document.getElementById('modalBuyNow').textContent='Mengarahkan...';
-      try{
-        const res = await fetch('/api/create-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-        const data = await res.json();
-        if(data.payment_url) window.location.href = data.payment_url;
-        else alert('Tidak ada payment_url dari server (demo)');
-      }catch(e){ alert('Error: ' + e.message); }
+    function vote(candidate) {
+      if (hasVoted) return;
+      votes[candidate]++;
+      localStorage.setItem("votes", JSON.stringify(votes));
+      localStorage.setItem("hasVoted", true);
+      hasVoted = true;
+      renderResults();
     }
 
-    document.getElementById('checkoutBtn').addEventListener('click', checkout);
-
-    /* update initially */
-    updateCartUI();
+    renderResults();
   </script>
-
-  <!-- ===== Server sample (Node/Express) =====
-       Simpan file server: server.js
-       Install: npm i express node-fetch body-parser
-       NOTE: Jangan letakkan secret TryPay di client-side. Simpan di server env.
-
-  const express = require('express');
-  const fetch = require('node-fetch');
-  const app = express();
-  app.use(express.json());
-
-  // load from environment
-  const TRY_PAY_SECRET = process.env.TRYPAY_SECRET || 'REPLACE_WITH_SECRET';
-  const TRY_PAY_API_URL = 'https://api.trypay.example/create'; // GANTI dengan endpoint resmi TryPay
-
-  app.post('/api/create-payment', async (req, res) => {
-    try{
-      const {items, metadata} = req.body;
-      // 1) validasi & simpan order ke DB
-      const order = { id: 'od_' + Date.now(), items, metadata, amount: items.reduce((s,i)=>s+(i.price*i.qty),0) };
-
-      // 2) panggil TryPay server-side
-      const payload = {
-        amount: order.amount,
-        currency: 'IDR',
-        items: order.items,
-        callback_url: 'https://yourdomain.com/api/trypay-webhook',
-        success_url: 'https://yourdomain.com/order/success?order=' + order.id,
-        cancel_url: 'https://yourdomain.com/order/cancel?order=' + order.id,
-        // metadata etc.
-      };
-
-      const r = await fetch(TRY_PAY_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${TRY_PAY_SECRET}` },
-        body: JSON.stringify(payload)
-      });
-      const tResp = await r.json();
-
-      // contoh response: { payment_url: 'https://trypay/checkout/abc' }
-      if(tResp.payment_url){
-        // simpan payment_url di order, lalu kirim ke client
-        return res.json({ payment_url: tResp.payment_url });
-      }
-      return res.status(500).json({ error: 'No payment URL returned', raw: tResp });
-    }catch(err){
-      console.error(err); return res.status(500).json({error: err.message});
-    }
-  });
-
-  // webhook endpoint
-  app.post('/api/trypay-webhook', (req,res)=>{
-    // verifikasi signature, update order status di DB
-    console.log('webhook', req.body);
-    res.status(200).send('ok');
-  });
-
-  app.listen(3000, ()=> console.log('Server running on :3000'));
-
-  ===== End server sample -->
 </body>
 </html>
